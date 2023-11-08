@@ -1,6 +1,9 @@
 # VSD_YOSYS_TCL_WORKSHOP
 5 - Days --> TCL Beginner to Advance Training Workshop by VSD 
 
+![Screenshot 2023-11-07 104811](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/bfaced3d-c963-4ed8-8ce9-52a20df88b87)
+
+
 # YOSYS TCL UI
 ![Static Badge](https://img.shields.io/badge/OS-linux-orange)
 ![Static Badge](https://img.shields.io/badge/EDA%20Tools-Yosys%2C_OpenTimer-navy)
@@ -134,6 +137,69 @@ our aim here is to write a script which will give us the output respectively con
 		echo
 	fi
 ```
+
+---------------------------------------------------------------------------------------------------
+day 2
+![Screenshot 2023-11-07 103815](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/9b7b9703-207d-4cc1-bda3-7b6c8efc8d26)
+
+Bellow mention task to be performed
+
+--> Creating a variable 
+
+--> Check if directories and files mentioned in .csv exist or not if not then we will be creating those directories
+
+--> Read all files in the "Netlist Directory"
+
+--> Create main synthsis script in format[2] to be used by yosys
+
+--> Pass the script to yosys
+
+# Creating a Variable
+
+We will be creating a variable for information mentioned in the details.csv file which will help us to make those details independent of the location that they are in the excel sheet.
+
+we will be converting the above excel into a matrix and the matrix with an array whith each block having its own specific index for both row and column then mapping those index with the user created variable name containing no spaces in between.
+
+
+![Screenshot 2023-11-07 111204](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/a3af7ae4-3bfa-4a55-b2de-e03bb50b77ba)
+
+we are not creating any new variable name we will be crating autovariable which will take the pre existing names
+
+```
+set filename [lindex 0]
+package require CSV
+package require struct::matrix
+struct::matrix m
+set f [ open $filename]
+CSV::read2matrix $f m, auto
+close $f
+set columns [m columns]
+m link my_arrray
+set no_of_rows [m rows]
+set i 0
+while {$i < no_of_rows} {
+puts "\nInfo :: Setting $my_array(0,$i) as 'my_array(1,$i)'"
+if {$i == 0} {
+	set [string map {" " ""} $my_array(0,$i)] $my_array(1,$i)
+} else {
+	set [string map {" " ""} $my_array(0,$i)] [file normalize $my_array(1,$i)]
+}
+set i [expr {$i + 1}]
+}
+}
+
+puts "\nInfo:: below are the list of initial variables and their values. User can use the vatiables for further debug. Use 'puts <variable name>' command to query value of below variables"
+puts "DesignName = $DesignName"
+puts "OutputDirectory = $OutputDirectory"
+puts "NetlistDirectory = $NetlistDirectory"
+puts "EarlyLibraryPath = $EarlyLibraryPath"
+puts "LateLibraryPath = $LateLibraryPath"
+puts "ConstraintsFile = $constraintsFile"
+
+
+
+
+
 
 
 
