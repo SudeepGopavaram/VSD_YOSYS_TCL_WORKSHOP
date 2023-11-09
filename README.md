@@ -35,6 +35,8 @@ First we will start with creation of the *suyosys* command script and *suyosys.t
 suyosys.tcl
 ![Screenshot 2023-11-03 185055](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/95b48816-4b6c-42c3-ba19-308f6cfd0d00)
 
+*Code*
+
 ```bash
 #------------------------------------------------------------------#
 #---------------------Tool Initialisation--------------------------#
@@ -137,9 +139,8 @@ our aim here is to write a script which will give us the output respectively con
 		echo
 	fi
 ```
+## Day 2 - Variable Creation and Processing Constraints from CSV
 
----------------------------------------------------------------------------------------------------
-day 2
 ![Screenshot 2023-11-07 103815](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/9b7b9703-207d-4cc1-bda3-7b6c8efc8d26)
 
 Bellow mention task to be performed
@@ -154,7 +155,7 @@ Bellow mention task to be performed
 
 --> Pass the script to yosys
 
-# Creating a Variable
+#### Creating a Variable
 
 We will be creating a variable for information mentioned in the details.csv file which will help us to make those details independent of the location that they are in the excel sheet.
 
@@ -165,43 +166,124 @@ we will be converting the above excel into a matrix and the matrix with an array
 
 we are not creating any new variable name we will be crating autovariable which will take the pre existing names
 
-```
-set filename [lindex 0]
-package require CSV
+*Code* 
+
+```tcl
+# Capturing start time of the script
+set start_time [clock clicks -microseconds]
+
+# Variable Creation
+# -----------------
+# Setting CLI argument to variable where argv is TCL builtin variable containing CLI arguments as list
+set dcsv [lindex $argv 0]
+
+# csv file ti matrix processing package
+package require csv
 package require struct::matrix
+
+# Initialisation of a matrix "m"
 struct::matrix m
-set f [ open $filename]
-CSV::read2matrix $f m, auto
+
+# Opening design details csv to file handler "f"
+set f [open $dcsv]
+
+# Parsing csv data to matrix "m"
+csv::read2matrix $f m , auto
+
+# Closing design details csv
 close $f
-set columns [m columns]
-m link my_arrray
-set no_of_rows [m rows]
+
+# Storing number of rows and columns of matrix to variables
+set ncdcsv [m columns]
+set nrdcsv [m rows]
+
+# Convertion of matrix to array "des_arr(column,row)"
+m link des_arr
+
+# Auto variable creation and data assignment
 set i 0
-while {$i < no_of_rows} {
-puts "\nInfo :: Setting $my_array(0,$i) as 'my_array(1,$i)'"
-if {$i == 0} {
-	set [string map {" " ""} $my_array(0,$i)] $my_array(1,$i)
+while {$i < $nrdcsv} {
+	puts "\nInfo: Setting $des_arr(0,$i) as '$des_arr(1,$i)'"
+	if { ![string match "*/*" $des_arr(1,$i)] && ![string match "*.*" $des_arr(1,$i)] } {
+		set [string map {" " "_"} $des_arr(0,$i)] $des_arr(1,$i)
+	} else {
+		set [string map {" " "_"} $des_arr(0,$i)] [file normalize $des_arr(1,$i)]
+	}
+	set i [expr {$i+1}]
+}
+```
+
+#### FILE AND DIRECTORY EXISTENCE CHECK
+
+Now we wrote a script to check the existence of all files and directories i.e. the path of the file or the file directly which we provided should be valid for the script to move forward
+
+```tcl
+# File/Directory existence check
+# ------------------------------
+# Checking if output directory exists if not creates one
+if { ![file isdirectory $Output_Directory] } {
+	puts "\nInfo: Cannot find output directory $Output_Directory. Creating $Output_Directory"
+	file mkdir $Output_Directory 
 } else {
-	set [string map {" " ""} $my_array(0,$i)] [file normalize $my_array(1,$i)]
-}
-set i [expr {$i + 1}]
-}
+	puts "\nInfo: Output directory found in path $Output_Directory"
 }
 
-puts "\nInfo:: below are the list of initial variables and their values. User can use the vatiables for further debug. Use 'puts <variable name>' command to query value of below variables"
-puts "DesignName = $DesignName"
-puts "OutputDirectory = $OutputDirectory"
-puts "NetlistDirectory = $NetlistDirectory"
-puts "EarlyLibraryPath = $EarlyLibraryPath"
-puts "LateLibraryPath = $LateLibraryPath"
-puts "ConstraintsFile = $constraintsFile"
+# Checking if netlist directory exists if not exits
+if { ![file isdirectory $Netlist_Directory] } {
+	puts "\nError: Cannot find RTL netlist directory in path $Netlist_Directory. Exiting..."
+	exit
+} else {
+	puts "\nInfo: RTL netlist directory found in path $Netlist_Directory"
+}
 
+# Checking if early cell library file exists if not exits
+if { ![file exists $Early_Library_Path] } {
+	puts "\nError: Cannot find early cell library in path $Early_Library_Path. Exiting..."
+	exit
+} else {
+	puts "\nInfo: Early cell library found in path $Early_Library_Path"
+}
 
+# Checking if late cell library file exists if not exits
+if { ![file exists $Late_Library_Path] } {
+	puts "\nError: Cannot find late cell library in path $Late_Library_Path. Exiting..."
+	exit
+} else {
+	puts "\nInfo: Late cell library found in path $Late_Library_Path"
+}
 
+# Checking if constraints file exists if not exits
+if { ![file exists $Constraints_File] } {
+	puts "\nError: Cannot find constraints file in path $Constraints_File. Exiting..."
+	exit
+} else {
+	puts "\nInfo: Constraints file found in path $Constraints_File"
+}
+```
+![Screenshot 2023-11-09 162422](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/0ca69e35-3a7f-43db-ac01-25294089327d)
 
+#### Processing of the constraints openMSP430_design_constraints.csv file
 
+*code*
 
+```tcl
+# Constraints csv file data processing for convertion to format[1] and SDC
+# ------------------------------------------------------------------------
+puts "\nInfo: Dumping SDC constraints for $Design_Name"
+::struct::matrix m1
+set f1 [open $Constraints_File]
+csv::read2matrix $f1 m1 , auto
+close $f1
+set nrconcsv [m1 rows]
+set ncconcsv [m1 columns]
+# Finding row number starting for CLOCKS section
+set clocks_start [lindex [lindex [m1 search all CLOCKS] 0] 1]
+# Finding column number starting for CLOCKS section
+set clocks_start_column [lindex [lindex [m1 search all CLOCKS] 0] 0]
+# Finding row number starting for INPUTS section
+set inputs_start [lindex [lindex [m1 search all INPUTS] 0] 1]
+# Finding row number starting for OUTPUTS section
+set outputs_start [lindex [lindex [m1 search all OUTPUTS] 0] 1]
+```
 
-
-   
-   
+![Screenshot 2023-11-09 172355](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/22387da9-6019-415a-9cf5-04172b80335d)
