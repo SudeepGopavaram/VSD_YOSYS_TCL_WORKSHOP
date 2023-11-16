@@ -32,6 +32,18 @@
   * OpenTimer STA Tool
   * TCL Matrix Package
 
+
+## Day 1 Introduction to TCL and VSDSYNTH Toolbox Usage
+
+Create command and pass .csv from UNIX shell to TCL script
+
+general scenerios - 
+1. Not provide .csv file as input
+2. Provide a .csv file, which doesn't exist
+3. type "-help" to find out usage
+
+
+
 ### Implementation
 
 First we will start with creation of the *suyosys* command script and *suyosys.tcl* files.
