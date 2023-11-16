@@ -1,5 +1,5 @@
 # VSD_YOSYS_TCL_WORKSHOP
-5 - Days --> TCL Beginner to Advance Training Workshop by VSD 
+5 - Days --> TCL Beginner to Advance Training Workshop by VSD Building an user interface (TCL BOX) which will take an excel sheet as an input and provide an output as a datasheet
 
 ![Screenshot 2023-11-07 104811](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/bfaced3d-c963-4ed8-8ce9-52a20df88b87)
 
@@ -19,6 +19,12 @@
   TCL scripting. The workshop's primary focus was on generating a comprehensive design report. This report is created by feeding design file paths in .csv format to a 
   TCL program. By the end of the fifth day, the ultimate goal is to provide specific design details, including design data pathways, to the "TCL BOX," a user interface 
   currently under development. The "TCL BOX" utilizes Yosys and Opentimer EDA tools to execute the design and produce a detailed design report.
+
+> This repo consist of following tasks-:
+1. create command (eg. suyosys) and pass .csv from UNIX shell to TCL script.
+2. convert all the inputs to format [1] & SDC format and pass to synthesis tool 'Yosys'.
+3. Convert format [1] & SDC to format [2] and pass to timing tool 'opentimer'.
+4. Generate the output report.
 
 ## Requirements
   * Linux
