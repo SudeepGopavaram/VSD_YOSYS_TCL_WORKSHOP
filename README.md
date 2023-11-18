@@ -37,7 +37,7 @@
 
 Create command and pass .csv from UNIX shell to TCL script
 
-general scenerios - 
+General Scenerios - 
 1. Not provide .csv file as input
 2. Provide a .csv file, which doesn't exist
 3. type "-help" to find out usage
@@ -60,108 +60,50 @@ suyosys.tcl
 #---------------------Tool Initialisation--------------------------#
 #------------------------------------------------------------------#
 
-if [ $# -eq 0 ]; then
-	echo "Info: Please provide the csv file"
-	exit 1
-elif [ $# -gt 1 ] && [ $1 != *.csv ]; then
-	echo "Info: Please provide only one csv file"
-	exit 1
-else
-	if [[ $1 != *.csv ]] && [ $1 != "-help" ]; then
-		echo "Info: Please provide a .csv format file"
-		exit 1
-	fi
+#Checking if user has provided with only one .csv file or not.
+if [ "$#" != 1 ]; then
+    echo -e "\nInfo :: Please provide only one .csv file. Exiting........."
+    exit 1
 fi
 
-if [ ! -e $1 ] || [ $1 == "-help" ]; then
-	if [ $1 != "-help" ]; then
-		echo "Error: Cannot find csv file $1. Exiting..."
-		exit 1
-	else
-		echo "USAGE:  ./suyosys <csv file>"
-		echo
-		echo "        where <csv file> consists of 2 columns, below keyword being in 1st column and is Case Sensitive. Please request Fayiz for sample csv file."
-		echo
-		echo "        <Design Name> is the name of top level module."
-		echo
-		echo "        <Output Directory> is the name of output directory where you want to dump synthesis script, synthesized netlist and timing reports."
-		echo
-		echo "        <Netlist Directory> is the name of directory where all RTL netlist are present."
-		echo
-		echo "        <Early Library Path> is the file path of the early cell library to be used for STA."
-		echo
-		echo "        <Late Library Path> is file path of the late cell library to be used for STA."
-		echo
-		echo "        <Constraints file> is csv file path of constraints to be used for STA."
-		echo
-	fi
-else
-	echo "Info: csv file $1 accepted"
-	tclsh suyosys.tcl $1
+#Cheking whether the user has provided  with the file or for command usage help. 
+if [ ! -f "$1" ] || [ "$1" == "-help" ]; then
+    if [ "$1" != "-help" ]; then
+        echo "Error :: Cannot find the csv file $1. Exiting..........."
+        exit 1
+    else
+        echo "USAGE: ./suyosys1 <csv file>"
+        echo
+        echo "Where <csv file> consists of 2 columns, below keyword being in 1st column and is Case Sensitive. Please request the designer for the sample csv file."
+        echo
+        echo "<Design Name> is the name of the top level module."
+        echo
+        echo "<Output Directory> is the name of the output directory where you want to dump synthesis script, synthesized netlist and timing reports."
+        echo
+        echo "<Netlist Directory> is the name of  directory where all RTL netlist are present."
+        echo
+        echo "<Early Library Path> is the file path of the early cell library to be used for STA."
+        echo
+        echo "<Late Library Path> is the file path of the late cell library to be used for STA."
+        echo
+        echo "<Constraints File> is csv file path of constraints to be used for STA."
+        echo
+        exit 1
+    fi
+
+#Checking if user has provided only with one file and if that file is  of .csv format only or not    
+elif [ "${1##*.}" == "csv" ] && [ "$#" -eq 1 ]; then
+    echo "Info :: csv file accepted :))"
+    tclsh suyosys1.tcl "$1"
 fi
+
 ```
 
-so here we are trying to make a command *suyosys* which will take one argument i.e. a file of .csv format to run eg: ./suyosys $1 [where $1 is called as argument]
-our aim here is to write a script which will give us the output respectively consisting of following basic general scenerios execution of command for every scenerio is explained below.
-
-1. What will happen when we will not provide any argument i.e. not giving any .csv file to the following command: -->
-   Below code snippet checks if we have not provided any argument then it will be showing an error to provide the csv file 
-   ```
-   if [ $# -eq 0 ]; then
-	 echo "Info: Please provide the csv file"
-	 exit 1
-   ```
-2. What will happen if the argument provided but it is not of .csv format: --> 
-   Below code snippet will check if the argument given is of .csv format or not if not then it will be giving the error
-   ```
-   elif [ $# -gt 1 ] && [ $1 != *.csv ]; then
-	echo "Info: Please provide only one csv file"
-	exit 1
-   ```
-3. What will happen if more than one .csv files are provided to the command: -->
-   Below code explains the following scenerio
-   ```
-   elif [ $# -gt 1 ] && [ $1 != *.csv ]; then
-	echo "Info: Please provide only one csv file"
-	exit 1
-   ```
-4. What Will happen if a non existing .csv file is given as an argument: -->
-   Below code snipet looks that if the command have any argument which is non existing or user has asked for help inplace of argument if in case none of the case are 
-   satisfied it will show the error that it cannot find the csv file
-   ```
-   if [ ! -e $1 ] || [ $1 == "-help" ]; then
-	if [ $1 != "-help" ]; then
-		echo "Error: Cannot find csv file $1. Exiting..."
-		exit 1
-   ```
-   
-6. What if user wants to know how the command works: -->
-    Below code snippet will show the entire USAGE of the following command.
-  ```
-	else
-		echo "USAGE:  ./suyosys <csv file>"
-		echo
-		echo "        where <csv file> consists of 2 columns, below keyword being in 1st column and is Case Sensitive. Please request Fayiz for sample csv file."
-		echo
-		echo "        <Design Name> is the name of top level module."
-		echo
-		echo "        <Output Directory> is the name of output directory where you want to dump synthesis script, synthesized netlist and timing reports."
-		echo
-		echo "        <Netlist Directory> is the name of directory where all RTL netlist are present."
-		echo
-		echo "        <Early Library Path> is the file path of the early cell library to be used for STA."
-		echo
-		echo "        <Late Library Path> is file path of the late cell library to be used for STA."
-		echo
-		echo "        <Constraints file> is csv file path of constraints to be used for STA."
-		echo
-	fi
-```
 ## Day 2 - Variable Creation and Processing Constraints from CSV
 
 ![Screenshot 2023-11-07 103815](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/9b7b9703-207d-4cc1-bda3-7b6c8efc8d26)
 
-Bellow mention task to be performed
+Now we will proceed with following tasks:-
 
 --> Creating a variable 
 
@@ -175,110 +117,126 @@ Bellow mention task to be performed
 
 #### Creating a Variable
 
-We will be creating a variable for information mentioned in the details.csv file which will help us to make those details independent of the location that they are in the excel sheet.
+We will be creating a variable for information mentioned in the openMSP430_design_details.csv file which will help us to make those details independent of the location that they are in the excel sheet.
 
-we will be converting the above excel into a matrix and the matrix with an array whith each block having its own specific index for both row and column then mapping those index with the user created variable name containing no spaces in between.
+we will be converting the above excel into a matrix and then link this matrix with an array whith each block having its own specific index for both row and column then mapping those index with the user created variable name containing underscore in place of spaces.
 
 
 ![Screenshot 2023-11-07 111204](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/a3af7ae4-3bfa-4a55-b2de-e03bb50b77ba)
 
-we are not creating any new variable name we will be crating autovariable which will take the pre existing names
+we are not creating any new variable name we will be crating autovariable which will take the pre existing names that are given in excel 
 
 *Code* 
 
 ```tcl
-# Capturing start time of the script
-set start_time [clock clicks -microseconds]
-
-# Variable Creation
-# -----------------
-# Setting CLI argument to variable where argv is TCL builtin variable containing CLI arguments as list
-set dcsv [lindex $argv 0]
-
-# csv file ti matrix processing package
+#csv file to matrix processing packages
 package require csv
 package require struct::matrix
 
-# Initialisation of a matrix "m"
+#Initialization of a matrix "m"
 struct::matrix m
 
-# Opening design details csv to file handler "f"
-set f [open $dcsv]
+#Opening of design details csv file to handle "f" and setting CLI argument to variable where argv is TCL built in variable containing CLI arguments as list
+set f [open [lindex $argv 0]]
 
-# Parsing csv data to matrix "m"
+#Parsing csv data to matrix "m"
 csv::read2matrix $f m , auto
 
-# Closing design details csv
+#Closing design details csv
 close $f
 
-# Storing number of rows and columns of matrix to variables
-set ncdcsv [m columns]
-set nrdcsv [m rows]
+#converting of matrix to array "my_array(column,row)"
+m link my_array
 
-# Convertion of matrix to array "des_arr(column,row)"
-m link des_arr
+#storing number of rows and columns of matrix to variables
+set num_of_cols [m columns]
+set num_of_rows [m rows]
+puts "\nInfo :: List of variables values."
+puts "\Total number of rows num_of_rows = $num_of_rows"
+puts "\Total number of cols num_of_cols = $num_of_cols"
 
-# Auto variable creation and data assignment
+#auto variable creation and data assignment
 set i 0
-while {$i < $nrdcsv} {
-	puts "\nInfo: Setting $des_arr(0,$i) as '$des_arr(1,$i)'"
-	if { ![string match "*/*" $des_arr(1,$i)] && ![string match "*.*" $des_arr(1,$i)] } {
-		set [string map {" " "_"} $des_arr(0,$i)] $des_arr(1,$i)
-	} else {
-		set [string map {" " "_"} $des_arr(0,$i)] [file normalize $des_arr(1,$i)]
-	}
-	set i [expr {$i+1}]
+
+while { $i < $num_of_rows } {
+    puts "\nInfo :: Setting $my_array(0,$i) as `$my_array(1,$i)`"  
+	#auto creating variable by replacing spaces in first column with underscore and assigning design name
+   if { $i == 0 } {
+        set [string map {" " "_" } $my_array(0,$i)] $my_array(1,$i)
+    } else {	
+	#auto creating variable by replacing spaces in first column with underscore and assigning design file/folder absolute path 
+        set [string map {" " "_"} $my_array(0,$i)]  [file normalize $my_array(1,$i)]
+    }
+    set i [expr {$i+1}]
 }
+
+puts "\nInfo :: Below are the list of initial variables and their values. User can use these variables for further debug. Use `puts <variable name>` command to query value of below variables"
+puts "DesignName         = $Design_Name"
+puts "Output_Directory   = $Output_Directory"
+puts "Netlist_Directory  = $Netlist_Directory"
+puts "Early_Library_Path = $Early_Library_Path"
+puts "Late_Library_Path  = $Late_Library_Path"
+puts "Constraints_File   = $Constraints_File"
+
+#return
+
 ```
 
 #### FILE AND DIRECTORY EXISTENCE CHECK
 
-Now we wrote a script to check the existence of all files and directories i.e. the path of the file or the file directly which we provided should be valid for the script to move forward
+Now we write a script to check the existence of all files and directories i.e. the path of the file or the file directly which we provided should be valid for the script to move forward
+
 
 ```tcl
-# File/Directory existence check
-# ------------------------------
-# Checking if output directory exists if not creates one
+#Checking if output directory is present or not........
 if { ![file isdirectory $Output_Directory] } {
-	puts "\nInfo: Cannot find output directory $Output_Directory. Creating $Output_Directory"
-	file mkdir $Output_Directory 
-} else {
-	puts "\nInfo: Output directory found in path $Output_Directory"
-}
+		puts "\nInfo :: Cannot find output directory $Output_Directory. Creating $Output_Directory"
+		file mkdir $Output_Directory
+	} else { 
+			puts "\nInfo :: Output directory found in path $Output_Directory"
+	}
 
-# Checking if netlist directory exists if not exits
-if { ![file isdirectory $Netlist_Directory] } {
-	puts "\nError: Cannot find RTL netlist directory in path $Netlist_Directory. Exiting..."
-	exit
-} else {
-	puts "\nInfo: RTL netlist directory found in path $Netlist_Directory"
-}
 
-# Checking if early cell library file exists if not exits
+#Checking if early cell library cell exists or not......
 if { ![file exists $Early_Library_Path] } {
-	puts "\nError: Cannot find early cell library in path $Early_Library_Path. Exiting..."
-	exit
-} else {
-	puts "\nInfo: Early cell library found in path $Early_Library_Path"
-}
+		puts "\nInfo :: Cannot find early cell library path $Early_Library_Path. Exiting........"
+	    exit
+	} else { 
+			puts "\nInfo :: Early cell library found in path $Early_Library_Path"
+	}
 
-# Checking if late cell library file exists if not exits
+
+#Checking if late cell library exixsts or not.......
 if { ![file exists $Late_Library_Path] } {
-	puts "\nError: Cannot find late cell library in path $Late_Library_Path. Exiting..."
-	exit
-} else {
-	puts "\nInfo: Late cell library found in path $Late_Library_Path"
-}
+		puts "\nInfo :: Cannot find late cell libraryin path $Late_Library_Path. Exiting........"
+	    exit
+	} else { 
+			puts "\nInfo ::  Late cell library found in path $Late_Library_Path"
+	}
 
-# Checking if constraints file exists if not exits
+
+#Checking if netlist directory is present or not.........
+if { ![file isdirectory $Netlist_Directory] } {
+		puts "\nInfo :: Cannot find RTL netlist directory $Netlist_Directory. Exiting........."
+	    exit
+	} else { 
+			puts "\nInfo :: Netlist  directory found in path $Netlist_Directory"
+	}
+
+
+#Checking if constraints file exists or not..........
 if { ![file exists $Constraints_File] } {
-	puts "\nError: Cannot find constraints file in path $Constraints_File. Exiting..."
-	exit
-} else {
-	puts "\nInfo: Constraints file found in path $Constraints_File"
-}
+		puts "\nInfo :: Cannot find constraints file in path $Constraints_File. Exiting........"
+		exit
+	} else { 
+			puts "\nInfo :: Constraints file found in path $Constraints_File"
+	}
+
+#return
 ```
+
 ![Screenshot 2023-11-09 162422](https://github.com/SudeepGopavaram/VSD_YOSYS_TCL_WORKSHOP/assets/57873021/0ca69e35-3a7f-43db-ac01-25294089327d)
+
 
 #### Processing of the constraints openMSP430_design_constraints.csv file
 
