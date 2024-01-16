@@ -1,0 +1,60 @@
+#!/bin/bash
+
+echo
+echo "            _|      _|                                                      _|_|_|   _|    _|"
+echo "              _|  _|    _|_|      _|_|_|  _|    _|    _|_|_|              _|_|       _|    _|"
+echo "                _|    _|    _|  _|_|      _|    _|  _|_|      _|_|_|_|_|      _|_|   _|    _|"
+echo "                _|    _|    _|      _|_|  _|    _|      _|_|             _|_|_|        _|_| "
+echo "                _|      _|_|    _|_|_|      _|_|_|  _|_|_|"
+echo "                                                _|"
+echo "                                            _|_|"
+echo 
+echo "      An unique User Interface (UI) that will take RTL netlist & SDC constraints as an input, and will generate"
+echo "      synthesized netlist & pre-layout timing report as an output. It uses Yosys open-source tool for synthesis"
+echo "                            and Opentimer to generate pre-layout timing reports."
+echo "                 Developed and Maintained by ASIC VLSI Design Engineer Sudeep Gopavaram."
+echo "               For any queries and bugs, please drop a mail to sudeepgopavaram@outlook.com"
+
+my_curr_dir=$(pwd)
+
+#-----------------------------------------------------------------------------------------------------#
+#-------------------------------Tool Initialization---------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------#
+
+
+#Checking if user has provided with only one .csv file or not.
+if [ "$#" != 1 ]; then
+    echo -e "\nInfo :: Please provide only one .csv file. Exiting........."
+    exit 1
+fi
+
+#Cheking whether the user has provided  with the file or for command usage help. 
+if [ ! -f "$1" ] || [ "$1" == "-help" ]; then 
+    if [ "$1" != "-help" ]; then
+        echo "Error :: Cannot find the csv file $1. Exiting..........."
+        exit 1
+    else 
+        echo "USAGE: ./suyosys1 <csv file>"
+        echo
+        echo "Where <csv file> consists of 2 columns, below keyword being in 1st column and is Case Sensitive. Please request the designer for the sample csv file."
+        echo
+        echo "<Design Name> is the name of the top level module."
+        echo
+        echo "<Output Directory> is the name of the output directory where you want to dump synthesis script, synthesized netlist and timing reports."
+        echo
+        echo "<Netlist Directory> is the name of  directory where all RTL netlist are present."
+        echo
+        echo "<Early Library Path> is the file path of the early cell library to be used for STA."
+        echo
+        echo "<Late Library Path> is the file path of the late cell library to be used for STA."
+        echo
+        echo "<Constraints File> is csv file path of constraints to be used for STA."
+        echo
+        exit 1    
+    fi
+
+#Checking if user has provided only with one file and if that file is  of .csv format only or not    
+elif [ "${1##*.}" == "csv" ] && [ "$#" -eq 1 ]; then
+	echo "Info :: csv file accepted :))"
+    tclsh suyosys1.tcl "$1"
+fi

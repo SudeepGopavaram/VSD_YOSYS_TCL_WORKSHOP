@@ -1,0 +1,61 @@
+#!/bin/bash
+
+echo
+echo "            _|      _|                                                      _|_|_|   _|    _|"
+echo "              _|  _|    _|_|      _|_|_|  _|    _|    _|_|_|              _|_|       _|    _|"
+echo "                _|    _|    _|  _|_|      _|    _|  _|_|      _|_|_|_|_|      _|_|   _|    _|"
+echo "                _|    _|    _|      _|_|  _|    _|      _|_|             _|_|_|        _|_| "
+echo "                _|      _|_|    _|_|_|      _|_|_|  _|_|_|"
+echo "                                                _|"
+echo "                                            _|_|"
+echo 
+echo "      An unique User Interface (UI) that will take RTL netlist & SDC constraints as an input, and will generate"
+echo "      sythnesized netlist & pre-layout timing report as an output. It uses Yosys open-source tool for synthesis"
+echo "                            and Opentimer to generate pre-layout timing reports."
+echo "                 Developed and Maintained by ASIC VLSI Design Engineer Sudeep Gopavaram."
+echo "               For any queries and bugs, please drop a mail to sudeepgopavaram@outlook.com"
+
+
+#set my_curr_dir = `pwd`
+
+#-----------------------------------------------------------------------------------------------------#
+#-------------------------------Tool Initialization---------------------------------------------------#
+#-----------------------------------------------------------------------------------------------------#
+
+if ( $# != 1 ) then
+
+	echo "\nInfo :: Please provide only one  .csv file. Exiting........."
+	exit 1
+
+fi
+
+if ( ! -f $1 ) || ( $1  == "-help" ) then 
+	if ( $argv != "-help" ) then
+		echo "Error :: Cannot find the csv file $1. Exiting..........."
+		exit 1
+	else 
+	
+		echo "USAGE: ./suyosys1 \<csv file\>"
+		echo
+		echo 	    "Where \<csv file\> consist of 2 columns, below keyword being in 1st column and is Case Sensitive. Please request the designer for the sample csv file."
+		echo
+		echo	    "\<Design Name\> is the name of the top level module."
+		echo
+		echo	    "\<Output Directory\> is the name of the output directory where you want to dump sythesis script, synthesized netlist and timing reports."
+		echo
+		echo	    "\<Netlist Directory\> is the name of  directory where all RTL netlist are present."
+		echo
+		echo	    "\<Early Library Path\> is the file path of the early cell library to be used for STA."
+		echo
+		echo	    "\<Late Library Path\> is file path of the late cell library to be used for STA."
+		echo
+		echo	    "\<Constraints File\> is csv file path of constrainsts to be used for STA."
+		echo
+		exit 1	
+	
+	fi
+
+elif ( $1 == *.csv ) && ( $# = 1 ) then
+	echo "Info :: csv file accepted."
+	tclsh suyosys1.tcl $argv[1]
+fi
